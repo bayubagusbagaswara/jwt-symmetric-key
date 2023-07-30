@@ -17,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -29,15 +32,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public RegistrationResponse registration(RegistrationRequest registrationRequest) {
-        Role role = roleRepository.findFirstByAuthority("USER")
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+        Role roleRead = roleRepository.findFirstByAuthority("READ")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role READ not found"));
 
-        log.info("Authority : {}", role.getAuthority());
+        Role roleUser = roleRepository.findFirstByAuthority("ROLE_USER")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role USER not found"));
+
+        Set<Role> authorities = new HashSet<>();
+        authorities.add(roleRead);
+        authorities.add(roleUser);
 
         User user = new User();
         user.setUsername(registrationRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        user.addRole(role);
+        user.setAuthorities(authorities);
 
         userRepository.save(user);
 

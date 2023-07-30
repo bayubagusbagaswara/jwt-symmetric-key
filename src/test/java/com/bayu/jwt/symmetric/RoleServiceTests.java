@@ -2,6 +2,7 @@ package com.bayu.jwt.symmetric;
 
 import com.bayu.jwt.symmetric.model.Role;
 import com.bayu.jwt.symmetric.repository.RoleRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,19 @@ public class RoleServiceTests {
     @Autowired
     RoleRepository roleRepository;
 
+    @BeforeEach
+    void setUp() {
+        roleRepository.deleteAll();;
+    }
+
     @Test
     void insertRoles() {
-        Role roleUser = new Role("USER");
-        Role roleAdmin = new Role("ADMIN");
+        Role roleUser = new Role("ROLE_USER");
+        Role roleAdmin = new Role("ROLE_ADMIN");
+        Role read = new Role("READ");
+        Role write = new Role("WRITE");
 
-        List<Role> roles = roleRepository.saveAll(List.of(roleUser, roleAdmin));
+        List<Role> roles = roleRepository.saveAll(List.of(roleUser, roleAdmin, read, write));
 
         for (Role role : roles) {
             log.info("ID : {}", role.getId());

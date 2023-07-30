@@ -30,7 +30,7 @@ public class TokenServiceImpl implements TokenService {
 
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .filter(authority -> !authority.startsWith("ROLE"))
+                .filter(authority -> !authority.startsWith("ROLE")) // ROLE_USER not included
                 .collect(Collectors.joining(" "));
 
         log.info("Scope : {}", scope); // READ

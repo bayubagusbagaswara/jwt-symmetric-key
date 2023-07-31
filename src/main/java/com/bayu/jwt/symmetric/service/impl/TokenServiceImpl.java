@@ -32,6 +32,8 @@ public class TokenServiceImpl implements TokenService {
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> !authority.startsWith("ROLE")) // ROLE_USER not included
                 .collect(Collectors.joining(" "));
+        // tidak semua role atau authority di expose ke scope, hanya READ saja
+        // jadi isi token cuma role READ saja, padahal user bisa saja memilik lebih dari 1 authority
 
         log.info("Scope : {}", scope); // READ
 
@@ -42,6 +44,8 @@ public class TokenServiceImpl implements TokenService {
                 .subject(authentication.getName())
                 .claim("scope", scope)
                 .build();
+
+        log.info("Claim : {}", claims.getClaimAsString("scope"));
 
         JwtEncoderParameters encoderParameters = JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS512).build(),

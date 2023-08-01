@@ -27,7 +27,6 @@ public class TokenServiceImpl implements TokenService {
 
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
-
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> !authority.startsWith("ROLE")) // ROLE_USER not included
@@ -47,11 +46,8 @@ public class TokenServiceImpl implements TokenService {
 
         log.info("Claim : {}", claims.getClaimAsString("scope"));
 
-        JwtEncoderParameters encoderParameters = JwtEncoderParameters.from(
-                JwsHeader.with(MacAlgorithm.HS512).build(),
-                claims);
-
-        return encoder.encode(encoderParameters).getTokenValue();
+        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
+        return this.encoder.encode(encoderParameters).getTokenValue();
     }
 
 }

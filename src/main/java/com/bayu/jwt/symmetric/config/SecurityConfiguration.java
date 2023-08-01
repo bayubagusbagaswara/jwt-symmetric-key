@@ -5,7 +5,6 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -58,13 +57,15 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // jika menggunakan hasRole, maka otomatis ditambahkan ROLE_
-                        .requestMatchers(HttpMethod.POST, "/api/home").hasRole("USER")
+                        .requestMatchers("/api/auth/registration").permitAll()
+                        .requestMatchers("/api/auth/signin").permitAll()
+                        // endpoint token can be access if user registered on system, then generated token, noted this is work if using httpBasic
+                        .requestMatchers("/api/auth/token/basic-auth").hasRole("USER")
                         .anyRequest().hasAuthority("SCOPE_READ"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults()))
+                .httpBasic(Customizer.withDefaults())
         ;
 
         return http.build();
